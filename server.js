@@ -4,6 +4,8 @@ const path = require('path')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
 
+app.set('view engine', 'ejs')
+
 require('dotenv').config()
 
 let uploadFilePath = ''
@@ -22,11 +24,11 @@ app.get('/', function (req, res) {
 })
 
 app.get('/login', function (req, res) {
-  res.sendFile(__dirname + '/login.html')
+ res.render('login.ejs')
 })
 
 app.get('/login2', function (req, res) {
-  res.sendFile(__dirname + '/login2.html')
+  res.render('register.ejs')
 })
 app.use('/public', express.static('public'))
 
