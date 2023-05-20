@@ -53,7 +53,7 @@
     <link href="/public/css/login.css" rel="stylesheet" />
   </head>
   <body class="text-center">
-    <form class="form-signin">
+    <form class="form-signin" action="/login" method="POST">
       <img
         class="mb-4"
         src="/public/css/title.jpg"
@@ -66,15 +66,17 @@
       <input
         type="email"
         id="inputEmail"
+        name="inputEmail"
         class="form-control"
         placeholder="Email address"
         required
         autofocus
       />
-      <label for="inputPassword" class="sr-only">Password</label>
+      <label for="inputPassword" class="sr-only" >Password</label>
       <input
         type="password"
         id="inputPassword"
+        name="inputPassword"
         class="form-control"
         placeholder="Password"
         required
@@ -90,7 +92,7 @@
 
       <div class="space"></div>
 
-      <a href="/login2">
+      <a href="/register">
         <button class="btn btn-lg btn-primary btn-block" type="button">
           회원가입
         </button>

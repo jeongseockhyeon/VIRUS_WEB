@@ -1,8 +1,20 @@
 const express = require('express')
 const multer = require('multer')
 const path = require('path')
+const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
+
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
+const session = require('express-session')
+
+app.use(bodyParser.urlencoded({extended:true}))
+app.use(express.urlencoded({extended:true}))
+
+app.use(session({secret:'비밀코드', resave:true, saveUninitialized: false}))
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.set('view engine', 'ejs')
 
@@ -27,9 +39,67 @@ app.get('/login', function (req, res) {
  res.render('login.ejs')
 })
 
-app.get('/login2', function (req, res) {
+app.get('/register', function (req, res) {
   res.render('register.ejs')
 })
+
+app.post('/register',function(req,res){
+  db.collection('users').insertOne(
+    { 성: req.body.firstName, 
+      이름: req.body.lastName,
+      이메일: req.body.email, 
+      비밀번호: req.body.password,
+      주소: req.body.address, 
+      국가: req.body.country, 
+      상세지역: req.body.state},
+      function(err,relsult){
+        res.send('전송 완료')
+      }
+  )
+})
+
+
+app.post('/login',
+ passport.authenticate('local',{failureRedirect:'/fail'}), 
+ function(req,res){
+  res.redirect('/')
+})
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField:'inputEmail',
+      passwordField:'inputPassword',
+      session:true,
+      passReqToCallback:false,
+    },
+    function(inputEmail,inputPassword,done){
+      db.collection('users').findOne(
+        {이메일:inputEmail},
+        function(err,result){
+          if (err) return done(err)
+          if (!result)
+            return done(null, false,{message:'가입되지않은 이메일입니다'})
+          if (inputPassword == result.비밀번호){
+            return done(null, result)
+          } else {
+            return done(null,false,{message:'비밀번호가 틀렸습니다'})
+          }
+        }
+      )
+    }
+  )
+)
+
+passport.serializeUser(function(user,done){
+  done(null,user.이메일)
+})
+passport.deserializeUser(function(email,done){
+  db.collection('users').findOne({이메일:email},function(err,result){
+    done(null,result)
+  })
+})
+
 app.use('/public', express.static('public'))
 
 app.use(express.static('public'))
