@@ -32,6 +32,18 @@ require('dotenv').config()
 let uploadFilePath = ''
 let db
 
+const scanEngine = ['Bkav', 'Lionic', 'tehtris', 'DrWeb', 'ClamAV', 'CMC', 'CAT-QuickHeal', 'ALYac', 'Malwarebytes', 'Zillya',
+'Paloalto', 'Sangfor', 'K7AntiVirus', 'Alibaba', 'K7GW', 'CrowdStrike', 'BitDefenderTheta', 'VirIT', 'Cyren',
+'SymantecMobileInsight', 'Symantec', 'Elastic', 'ESET-NOD32', 'APEX', 'TrendMicro-HouseCall', 'Avast',
+'Cynet', 'Kaspersky', 'BitDefender', 'NANO-Antivirus', 'SUPERAntiSpyware', 'MicroWorld-eScan',
+'Tencent', 'Trustlook', 'TACHYON', 'Sophos', 'F-Secure', 'Baidu', 'TrendMicro', 'McAfee-GW-Edition',
+'Trapmine', 'FireEye', 'Emsisoft', 'SentinelOne', 'GData', 'Jiangmin', 'Webroot', 'Avira', 'Antiy-AVL', 'Gridinsoft',
+'Xcitium', 'Arcabit', 'ViRobot', 'ZoneAlarm', 'Avast-Mobile', 'Microsoft', 'Google', 'BitDefenderFalx',
+'AhnLab-V3', 'Acronis', 'McAfee', 'MAX', 'VBA32', 'Cylance', 'Zoner', 'Rising', 'Yandex', 'Ikarus', 'MaxSecure',
+'Fortinet', 'AVG', 'Panda']
+
+
+
 MongoClient.connect(process.env.MONGODB_URL, function (error, client) {
   if (error) return console.log(error)
   db = client.db('virus_scan')
@@ -222,9 +234,8 @@ app.get('/result/:id', function(req, res) {
     }
 
     try {
-      console.log(result.result)
-      jsonResult = result.result
-      res.render('result.ejs', { scanResult :jsonResult });
+      jsonResult = JSON.parse(result.result)
+      res.render('result.ejs', { scanResult :jsonResult , scanEngine });
     } catch (error) {
       console.error('JSON 파싱 오류', error);
       res.status(500).send('Internal Server Error');

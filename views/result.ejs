@@ -34,20 +34,33 @@
     </a>
   </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script>
-      $('#search').click(function () {
-        var 입력한값 = $('#search-input').val()
-        window.location.replace('/search?value=' + 입력한값)
-      })
-    </script>
 
     <ul class="list-group">
       <li class="list-group-item">
-        <h4><%= scanResult %></h4>
-        <p>할일 마감날짜</p>
-        <button >임시</button>
+        <h4>파일명: <%= scanResult.data.attributes.names[2] %></h4>
+        <p>타입:<%= scanResult.data.attributes.type_description %></p>
+        <p><%= scanResult.data.attributes.popular_threat_classification.popular_threat_category[0].value %></p>
+        <p><%= scanResult.data.attributes.popular_threat_classification.popular_threat_category[0].count %></p>
       </li>
     </ul>
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <div class="container">
+            <div class="row">
+                <% for (let i = 0; i < scanEngine.length; i++) { %>
+                    <div class="col-md-3">
+                        <div class="card border-secondary mb-3" style="max-width: 20rem;">
+                            <div class="card-header"><%= scanResult.data.attributes.last_analysis_results[scanEngine[i]].engine_name %></div>
+                            <div class="card-body">
+                                <p class="card-title"><%= scanResult.data.attributes.last_analysis_results[scanEngine[i]].category %></p>
+                                <p class="card-text"><%= scanResult.data.attributes.last_analysis_results[scanEngine[i]].result %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
