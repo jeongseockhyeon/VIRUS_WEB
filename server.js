@@ -17,6 +17,9 @@ app.use(express.urlencoded({extended:true}))
 app.use(session({secret:'비밀코드', resave:true, saveUninitialized: false}))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use('/public', express.static('public'))
+app.use(express.static('public'))
+
 
 app.set('view engine', 'ejs')
 
@@ -76,12 +79,11 @@ app.post('/register', async function(req, res) {
   }
 });
 
-
-app.post('/login',
- passport.authenticate('local',{failureRedirect:'/fail'}), 
- function(req,res){
-  res.redirect('/')
-})
+app.post('/login',passport.authenticate('local',{failureRedirect:'/login'}),
+  function(req,res){
+    res.redirect('/')
+  }
+)
 
 passport.use(
   new LocalStrategy(
@@ -95,22 +97,18 @@ passport.use(
       db.collection('users').findOne(
         {이메일:inputEmail},
         function(err,result){
-          if (err) return done(err)
-          if (!result)
-            return done(null, false,{message:'가입되지않은 이메일입니다'})
-          if (inputPassword == result.비밀번호){
-            return done(null, result)
+          if (err) return done (err)
+          if (!result) return done (null,false,{message:'가입되지 않은 이메일입니다.'})
+          if (bcrypt.compareSync(inputPassword, result.비밀번호) ){
+            return done (null , result)
           } else {
-            return done(null,false,{message:'비밀번호가 틀렸습니다'})
+            return done (null,false,{message:'비밀번호가 틀렸습니다'})
           }
         }
       )
     }
   )
 )
-app.get('/fail',function(req,res){
-  res.send('로그인 실패')
-})
 
 passport.serializeUser(function(user,done){
   done(null,user.이메일)
@@ -121,9 +119,6 @@ passport.deserializeUser(function(email,done){
   })
 })
 
-app.use('/public', express.static('public'))
-
-app.use(express.static('public'))
 // 파일 저장 디렉토리 설정
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
