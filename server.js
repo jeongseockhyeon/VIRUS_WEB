@@ -4,8 +4,12 @@ const User = require('./models/User')
 const path = require('path')
 const bcrypt = require('bcryptjs')
 const bodyParser = require('body-parser')
+
 const MongoClient = require('mongodb').MongoClient
 const app = express()
+
+const {ObjectId} = require('mongodb')
+
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
@@ -172,21 +176,20 @@ app.get('/scan', (req, res) => {
 
   pythonProcess.stdout.on('end', () => {
     console.log('Python process ended')
-    console.log(pythonResult)
 
     db.collection('scanresult').insertOne(
-      { result: pythonResult },
+      {result: pythonResult },
       (error, result) => {
         if (error) {
           console.error('MongoDB 저장 오류', error)
           res.status(500).send('Internal Server Error')
           return
         }
-
+        const savedId = result.insertedId
+        console.log(savedId)
         console.log('결과 저장 완료')
-        res.send(pythonResult)
-      }
-    )
+        res.redirect(`/result/${savedId}`)
+      })
   })
 
   pythonProcess.stderr.on('data', (data) => {
@@ -200,3 +203,31 @@ app.get('/scan', (req, res) => {
     console.log(`child process exited with code ${code}`)
   })
 })
+
+app.get('/result/:id', function(req, res) {
+  const id =req.params.id
+  const objectId = new ObjectId(id)
+  console.log(objectId)
+  db.collection('scanresult').findOne({ _id: objectId}, function(err, result) {
+    if (err) {
+      console.error('데이터베이스 조회 오류', err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    if (!result) {
+      console.error('결과를 찾을 수 없습니다');
+      res.status(404).send('Not Found');
+      return;
+    }
+
+    try {
+      console.log(result.result)
+      jsonResult = result.result
+      res.render('result.ejs', { scanResult :jsonResult });
+    } catch (error) {
+      console.error('JSON 파싱 오류', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+});

@@ -24,6 +24,7 @@ def main():
 
     response = requests.get(url, headers=headers)
     result = json.dumps(response.json())
+    print(result)
     return result   
 if __name__=='__main__':
     main()
