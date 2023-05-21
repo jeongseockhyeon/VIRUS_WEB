@@ -1,6 +1,8 @@
 const express = require('express')
 const multer = require('multer')
+const User = require('./models/User')
 const path = require('path')
+const bcrypt = require('bcryptjs')
 const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
@@ -43,20 +45,36 @@ app.get('/register', function (req, res) {
   res.render('register.ejs')
 })
 
-app.post('/register',function(req,res){
-  db.collection('users').insertOne(
-    { 성: req.body.firstName, 
-      이름: req.body.lastName,
-      이메일: req.body.email, 
-      비밀번호: req.body.password,
-      주소: req.body.address, 
-      국가: req.body.country, 
-      상세지역: req.body.state},
-      function(err,relsult){
-        res.send('전송 완료')
-      }
-  )
-})
+app.post('/register', async function(req, res) {
+  const { 성, 이름, 아이디, 이메일, 비밀번호, 주소, 국가, 세부지역 } = req.body;
+  
+
+  try {
+    let user = await db.collection('users').findOne({ 이메일 });
+    if (user) {
+      return res.status(400).json({ errors: [{ message: '이미 가입된 이메일입니다.' }] });
+    }
+
+    const hashedPassword = await bcrypt.hash(비밀번호, 10);
+    user = new User({
+      성,
+      이름,
+      아이디,
+      이메일,
+      비밀번호: hashedPassword,
+      주소,
+      국가,
+      세부지역,
+    });
+
+    db.collection('users').insertOne(user)
+
+    res.redirect('/login');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('오류 발생');
+  }
+});
 
 
 app.post('/login',
@@ -90,6 +108,9 @@ passport.use(
     }
   )
 )
+app.get('/fail',function(req,res){
+  res.send('로그인 실패')
+})
 
 passport.serializeUser(function(user,done){
   done(null,user.이메일)
