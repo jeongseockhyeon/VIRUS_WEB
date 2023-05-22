@@ -8,22 +8,20 @@ const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient
 const app = express()
 
-const {ObjectId} = require('mongodb')
-
+const { ObjectId } = require('mongodb')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const session = require('express-session')
 
-app.use(bodyParser.urlencoded({extended:true}))
-app.use(express.urlencoded({extended:true}))
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }))
 
-app.use(session({secret:'비밀코드', resave:true, saveUninitialized: false}))
+app.use(session({ secret: '비밀코드', resave: true, saveUninitialized: false }))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use('/public', express.static('public'))
 app.use(express.static('public'))
-
 
 app.set('view engine', 'ejs')
 
@@ -32,17 +30,80 @@ require('dotenv').config()
 let uploadFilePath = ''
 let db
 
-const scanEngine = ['Bkav', 'Lionic', 'tehtris', 'DrWeb', 'ClamAV', 'CMC', 'CAT-QuickHeal', 'ALYac', 'Malwarebytes', 'Zillya',
-'Paloalto', 'Sangfor', 'K7AntiVirus', 'Alibaba', 'K7GW', 'CrowdStrike', 'BitDefenderTheta', 'VirIT', 'Cyren',
-'SymantecMobileInsight', 'Symantec', 'Elastic', 'ESET-NOD32', 'APEX', 'TrendMicro-HouseCall', 'Avast',
-'Cynet', 'Kaspersky', 'BitDefender', 'NANO-Antivirus', 'SUPERAntiSpyware', 'MicroWorld-eScan',
-'Tencent', 'Trustlook', 'TACHYON', 'Sophos', 'F-Secure', 'Baidu', 'TrendMicro', 'McAfee-GW-Edition',
-'Trapmine', 'FireEye', 'Emsisoft', 'SentinelOne', 'GData', 'Jiangmin', 'Webroot', 'Avira', 'Antiy-AVL', 'Gridinsoft',
-'Xcitium', 'Arcabit', 'ViRobot', 'ZoneAlarm', 'Avast-Mobile', 'Microsoft', 'Google', 'BitDefenderFalx',
-'AhnLab-V3', 'Acronis', 'McAfee', 'MAX', 'VBA32', 'Cylance', 'Zoner', 'Rising', 'Yandex', 'Ikarus', 'MaxSecure',
-'Fortinet', 'AVG', 'Panda']
-
-
+const scanEngine = [
+  'Bkav',
+  'Lionic',
+  'tehtris',
+  'DrWeb',
+  'ClamAV',
+  'CMC',
+  'CAT-QuickHeal',
+  'ALYac',
+  'Malwarebytes',
+  'Zillya',
+  'Paloalto',
+  'Sangfor',
+  'K7AntiVirus',
+  'Alibaba',
+  'K7GW',
+  'CrowdStrike',
+  'BitDefenderTheta',
+  'VirIT',
+  'Cyren',
+  'SymantecMobileInsight',
+  'Symantec',
+  'Elastic',
+  'ESET-NOD32',
+  'APEX',
+  'TrendMicro-HouseCall',
+  'Avast',
+  'Cynet',
+  'Kaspersky',
+  'BitDefender',
+  'NANO-Antivirus',
+  'SUPERAntiSpyware',
+  'MicroWorld-eScan',
+  'Tencent',
+  'Trustlook',
+  'TACHYON',
+  'Sophos',
+  'F-Secure',
+  'Baidu',
+  'TrendMicro',
+  'McAfee-GW-Edition',
+  'Trapmine',
+  'FireEye',
+  'Emsisoft',
+  'SentinelOne',
+  'GData',
+  'Jiangmin',
+  'Webroot',
+  'Avira',
+  'Antiy-AVL',
+  'Gridinsoft',
+  'Xcitium',
+  'Arcabit',
+  'ViRobot',
+  'ZoneAlarm',
+  'Avast-Mobile',
+  'Microsoft',
+  'Google',
+  'BitDefenderFalx',
+  'AhnLab-V3',
+  'Acronis',
+  'McAfee',
+  'MAX',
+  'VBA32',
+  'Cylance',
+  'Zoner',
+  'Rising',
+  'Yandex',
+  'Ikarus',
+  'MaxSecure',
+  'Fortinet',
+  'AVG',
+  'Panda',
+]
 
 MongoClient.connect(process.env.MONGODB_URL, function (error, client) {
   if (error) return console.log(error)
@@ -57,24 +118,25 @@ app.get('/', function (req, res) {
 })
 
 app.get('/login', function (req, res) {
- res.render('login.ejs')
+  res.render('login.ejs')
 })
 
 app.get('/register', function (req, res) {
   res.render('register.ejs')
 })
 
-app.post('/register', async function(req, res) {
-  const { 성, 이름, 아이디, 이메일, 비밀번호, 주소, 국가, 세부지역 } = req.body;
-  
+app.post('/register', async function (req, res) {
+  const { 성, 이름, 아이디, 이메일, 비밀번호, 주소, 국가, 세부지역 } = req.body
 
   try {
-    let user = await db.collection('users').findOne({ 이메일 });
+    let user = await db.collection('users').findOne({ 이메일 })
     if (user) {
-      return res.status(400).json({ errors: [{ message: '이미 가입된 이메일입니다.' }] });
+      return res
+        .status(400)
+        .json({ errors: [{ message: '이미 가입된 이메일입니다.' }] })
     }
 
-    const hashedPassword = await bcrypt.hash(비밀번호, 10);
+    const hashedPassword = await bcrypt.hash(비밀번호, 10)
     user = new User({
       성,
       이름,
@@ -84,19 +146,21 @@ app.post('/register', async function(req, res) {
       주소,
       국가,
       세부지역,
-    });
+    })
 
     db.collection('users').insertOne(user)
 
-    res.redirect('/login');
+    res.redirect('/login')
   } catch (error) {
-    console.log(error);
-    res.status(500).send('오류 발생');
+    console.log(error)
+    res.status(500).send('오류 발생')
   }
-});
+})
 
-app.post('/login',passport.authenticate('local',{failureRedirect:'/login'}),
-  function(req,res){
+app.post(
+  '/login',
+  passport.authenticate('local', { failureRedirect: '/login' }),
+  function (req, res) {
     res.redirect('/')
   }
 )
@@ -104,21 +168,22 @@ app.post('/login',passport.authenticate('local',{failureRedirect:'/login'}),
 passport.use(
   new LocalStrategy(
     {
-      usernameField:'inputEmail',
-      passwordField:'inputPassword',
-      session:true,
-      passReqToCallback:false,
+      usernameField: 'inputEmail',
+      passwordField: 'inputPassword',
+      session: true,
+      passReqToCallback: false,
     },
-    function(inputEmail,inputPassword,done){
+    function (inputEmail, inputPassword, done) {
       db.collection('users').findOne(
-        {이메일:inputEmail},
-        function(err,result){
-          if (err) return done (err)
-          if (!result) return done (null,false,{message:'가입되지 않은 이메일입니다.'})
-          if (bcrypt.compareSync(inputPassword, result.비밀번호) ){
-            return done (null , result)
+        { 이메일: inputEmail },
+        function (err, result) {
+          if (err) return done(err)
+          if (!result)
+            return done(null, false, { message: '가입되지 않은 이메일입니다.' })
+          if (bcrypt.compareSync(inputPassword, result.비밀번호)) {
+            return done(null, result)
           } else {
-            return done (null,false,{message:'비밀번호가 틀렸습니다'})
+            return done(null, false, { message: '비밀번호가 틀렸습니다' })
           }
         }
       )
@@ -126,12 +191,12 @@ passport.use(
   )
 )
 
-passport.serializeUser(function(user,done){
-  done(null,user.이메일)
+passport.serializeUser(function (user, done) {
+  done(null, user.이메일)
 })
-passport.deserializeUser(function(email,done){
-  db.collection('users').findOne({이메일:email},function(err,result){
-    done(null,result)
+passport.deserializeUser(function (email, done) {
+  db.collection('users').findOne({ 이메일: email }, function (err, result) {
+    done(null, result)
   })
 })
 
@@ -190,7 +255,7 @@ app.get('/scan', (req, res) => {
     console.log('Python process ended')
 
     db.collection('scanresult').insertOne(
-      {result: pythonResult },
+      { result: pythonResult },
       (error, result) => {
         if (error) {
           console.error('MongoDB 저장 오류', error)
@@ -201,7 +266,8 @@ app.get('/scan', (req, res) => {
         console.log(savedId)
         console.log('결과 저장 완료')
         res.redirect(`/result/${savedId}`)
-      })
+      }
+    )
   })
 
   pythonProcess.stderr.on('data', (data) => {
@@ -216,29 +282,33 @@ app.get('/scan', (req, res) => {
   })
 })
 
-app.get('/result/:id', function(req, res) {
-  const id =req.params.id
+app.get('/result/:id', function (req, res) {
+  const id = req.params.id
   const objectId = new ObjectId(id)
   console.log(objectId)
-  db.collection('scanresult').findOne({ _id: objectId}, function(err, result) {
-    if (err) {
-      console.error('데이터베이스 조회 오류', err);
-      res.status(500).send('Internal Server Error');
-      return;
-    }
+  db.collection('scanresult').findOne(
+    { _id: objectId },
+    function (err, result) {
+      if (err) {
+        console.error('데이터베이스 조회 오류', err)
+        res.status(500).send('Internal Server Error')
+        return
+      }
 
-    if (!result) {
-      console.error('결과를 찾을 수 없습니다');
-      res.status(404).send('Not Found');
-      return;
-    }
+      if (!result) {
+        console.error('결과를 찾을 수 없습니다')
+        res.status(404).send('Not Found')
+        return
+      }
 
-    try {
-      jsonResult = JSON.parse(result.result)
-      res.render('result.ejs', { scanResult :jsonResult , scanEngine });
-    } catch (error) {
-      console.error('JSON 파싱 오류', error);
-      res.status(500).send('Internal Server Error');
+      try {
+        jsonResult = JSON.parse(result.result)
+        console.log(jsonResult)
+        res.render('result.ejs', { scanResult: jsonResult, scanEngine })
+      } catch (error) {
+        console.error('JSON 파싱 오류', error)
+        res.status(500).send('Internal Server Error')
+      }
     }
-  });
-});
+  )
+})
