@@ -43,28 +43,21 @@
           %>
         </h4>
         <p>타입:<%= scanResult.data.attributes.type_description %></p>
-        <% if
-        (!scanResult.data.attributes.popular_threat_classification.popular_threat_category
-        ||
-        scanResult.data.attributes.popular_threat_classification.popular_threat_category.length
-        === 0) { %>
-        <p>검출된 바이러스가 없습니다</p>
-        <% } else { %> <% for (let i = 0; i <
-        scanResult.data.attributes.popular_threat_classification.popular_threat_category.length;
-        i++) { %>
-        <p>
-          검출된 바이러스명: <%=
-          scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].value
-          %>
-        </p>
-        <p>
-          검출된 개수: <%=
-          scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].count
-          %>
-        </p>
-        <% } %> <% } %>
+        <% if(scanResult.data.attributes.popular_threat_classification) { %>
+          <% for (let i = 0; i < scanResult.data.attributes.popular_threat_classification.popular_threat_category.length; i++) { %>
+            <p>
+              검출된 바이러스명: <%= scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].value %>
+            </p>
+            <p>
+              검출된 개수: <%= scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].count %>
+            </p>
+          <% } %>
+        <% } else { %>
+          <p>해당 파일은 안전합니다. :)</p>
+        <% } %>
       </li>
     </ul>
+    
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
       <div class="container">
         <div class="row">
@@ -94,6 +87,8 @@
         </div>
       </div>
     </div>
+    
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
