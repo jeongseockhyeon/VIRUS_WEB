@@ -43,7 +43,13 @@
           %>
         </h4>
         <p>타입:<%= scanResult.data.attributes.type_description %></p>
-        <% for (let i = 0; i<
+        <% if
+        (!scanResult.data.attributes.popular_threat_classification.popular_threat_category
+        ||
+        scanResult.data.attributes.popular_threat_classification.popular_threat_category.length
+        === 0) { %>
+        <p>검출된 바이러스가 없습니다</p>
+        <% } else { %> <% for (let i = 0; i <
         scanResult.data.attributes.popular_threat_classification.popular_threat_category.length;
         i++) { %>
         <p>
@@ -56,7 +62,7 @@
           scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].count
           %>
         </p>
-        <% } %>
+        <% } %> <% } %>
       </li>
     </ul>
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
