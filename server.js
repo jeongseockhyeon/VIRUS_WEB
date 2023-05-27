@@ -265,27 +265,34 @@ app.get('/scan', (req, res) => {
   pythonProcess.stdout.on('end', () => {
     console.log('Python process ended')
     deleteFile(uploadFilePath)
-    db.collection('scanresult').findOne({ result :pythonResult }, (existingResult) => {
-      console.log('DB 확인')
+    db.collection('scanresult').findOne({ result: pythonResult }, (error, existingResult) => {
+      if (error) {
+        console.error('MongoDB 조회 오류', error);
+        res.status(500).send('Internal Server Error');
+        return;
+      }
+      
+      console.log('DB 확인');
       if (!existingResult) {
+        // pythonResult가 이미 저장되지 않은 경우
         db.collection('scanresult').insertOne({ result: pythonResult }, (error, result) => {
           if (error) {
             console.error('MongoDB 저장 오류', error);
             res.status(500).send('Internal Server Error');
             return;
           }
-          const savedId = result.insertedId;
+          const savedId = result.insertedId;  // 삽입된 문서의 _id 값
           console.log(savedId);
           console.log('결과 저장 완료');
-          res.redirect(`/result/${savedId}`);
+          res.redirect(`/result/${savedId}`);  // 저장된 문서의 ID를 포함한 URL로 리다이렉트
         });
       } else {
-        const findId = existingResult._id;
+        // pythonResult가 이미 저장된 경우
+        const findId = existingResult._id;  // 이미 저장된 문서의 _id 값
         console.log(findId);
-        res.redirect(`/result/${findId}`);
+        res.redirect(`/result/${findId}`);  // 저장된 문서의 ID를 포함한 URL로 리다이렉트
       }
     })
-    
   })
 
   pythonProcess.stderr.on('data', (data) => {
