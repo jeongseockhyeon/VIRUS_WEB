@@ -1,6 +1,7 @@
 const express = require('express')
 const multer = require('multer')
 const User = require('./models/User')
+const fs = require('fs')
 const path = require('path')
 const bcrypt = require('bcryptjs')
 const bodyParser = require('body-parser')
@@ -227,6 +228,16 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.redirect(`/scan`)
   }
 })
+//파일 삭제 처리 함수
+const deleteFile = filePath =>{
+  fs.unlink(filePath,(err)=>{
+    if (err) {
+      console.error('파일 삭제 오류', error)
+    } else {
+      console.log('파일삭제 완료')
+    }
+  }) 
+}
 //파이썬 프로그램 호출 및 파일 경로 전송
 app.get('/scan', (req, res) => {
   const filePath = uploadFilePath
@@ -253,21 +264,28 @@ app.get('/scan', (req, res) => {
 
   pythonProcess.stdout.on('end', () => {
     console.log('Python process ended')
-
-    db.collection('scanresult').insertOne(
-      { result: pythonResult },
-      (error, result) => {
-        if (error) {
-          console.error('MongoDB 저장 오류', error)
-          res.status(500).send('Internal Server Error')
-          return
-        }
-        const savedId = result.insertedId
-        console.log(savedId)
-        console.log('결과 저장 완료')
-        res.redirect(`/result/${savedId}`)
+    deleteFile(uploadFilePath)
+    db.collection('scanresult').findOne({ result :pythonResult }, (existingResult) => {
+      console.log('DB 확인')
+      if (!existingResult) {
+        db.collection('scanresult').insertOne({ result: pythonResult }, (error, result) => {
+          if (error) {
+            console.error('MongoDB 저장 오류', error);
+            res.status(500).send('Internal Server Error');
+            return;
+          }
+          const savedId = result.insertedId;
+          console.log(savedId);
+          console.log('결과 저장 완료');
+          res.redirect(`/result/${savedId}`);
+        });
+      } else {
+        const findId = existingResult._id;
+        console.log(findId);
+        res.redirect(`/result/${findId}`);
       }
-    )
+    })
+    
   })
 
   pythonProcess.stderr.on('data', (data) => {
