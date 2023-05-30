@@ -265,6 +265,7 @@ app.get('/scan', (req, res) => {
   pythonProcess.stdout.on('end', () => {
     console.log('Python process ended')
     deleteFile(uploadFilePath)
+    // DB에서 이미 저장된 결과값인지 검색
     db.collection('scanresult').findOne({ result: pythonResult }, (error, existingResult) => {
       if (error) {
         console.error('MongoDB 조회 오류', error);
@@ -284,13 +285,13 @@ app.get('/scan', (req, res) => {
           const savedId = result.insertedId;  // 삽입된 문서의 _id 값
           console.log(savedId);
           console.log('결과 저장 완료');
-          res.redirect(`/result/${savedId}`);  // 저장된 문서의 ID를 포함한 URL로 리다이렉트
+          res.redirect(`/result/${savedId}`);  
         });
       } else {
         // pythonResult가 이미 저장된 경우
         const findId = existingResult._id;  // 이미 저장된 문서의 _id 값
         console.log(findId);
-        res.redirect(`/result/${findId}`);  // 저장된 문서의 ID를 포함한 URL로 리다이렉트
+        res.redirect(`/result/${findId}`);  
       }
     })
   })
