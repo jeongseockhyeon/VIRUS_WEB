@@ -106,6 +106,9 @@ const scanEngine = [
   'Panda',
 ]
 
+const allowedExtensions = ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.xlsm', '.pdf'];
+
+
 MongoClient.connect(process.env.MONGODB_URL, function (error, client) {
   if (error) return console.log(error)
   db = client.db('virus_scan')
@@ -214,30 +217,36 @@ const storage = multer.diskStorage({
 // 파일 업로드 미들웨어 생성
 const upload = multer({ storage: storage })
 
+// 파일 삭제 처리 함수
+const deleteFile = filePath => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('파일 삭제 오류', err);
+    } else {
+      console.log('파일 삭제 완료');
+    }
+  });
+};
+
 // 파일 업로드 처리 라우터
 app.post('/upload', upload.single('file'), (req, res) => {
-  // single 메서드를 이용하여 하나의 파일만 업로드하도록 설정
-  // 'file'은 프론트엔드에서 업로드할 때 사용한 name 속성 값입니다.
-
   if (!req.file) {
-    res.status(400).send('파일이 업로드되지 않았습니다.')
-  } else {
-    const filePath = path.resolve(req.file.path)
-    console.log('업로드 완료!')
-    uploadFilePath = filePath
-    res.redirect(`/scan`)
+    res.status(400).send('파일이 업로드되지 않았습니다.');
+    return;
   }
+  const filePath = path.resolve(req.file.path);
+  uploadFilePath = filePath
+  const fileExtension = path.extname(req.file.originalname).toLowerCase();
+  if (!allowedExtensions.includes(fileExtension)) {
+    deleteFile(filePath);
+    res.status(400).send('허용되지 않는 파일입니다.');
+    return;
+  }
+
+  console.log('파일 유형:', fileExtension);
+  console.log('업로드 완료!');
+  res.redirect('/scan');
 })
-//파일 삭제 처리 함수
-const deleteFile = filePath =>{
-  fs.unlink(filePath,(err)=>{
-    if (err) {
-      console.error('파일 삭제 오류', error)
-    } else {
-      console.log('파일삭제 완료')
-    }
-  }) 
-}
 //파이썬 프로그램 호출 및 파일 경로 전송
 app.get('/scan', (req, res) => {
   const filePath = uploadFilePath
