@@ -20,18 +20,20 @@
   </head>
   <script>
     function validateFileName() {
-      var fileInput = document.querySelector('input[name="file"]');
-      var fileName = fileInput.value;
-      var allowedCharacters = /^[0-9a-zA-Z.]+$/; // 알파벳 대소문자, 숫자, 점(.) 허용
-
-      if (!allowedCharacters.test(fileName)) {
+      const fileInput = document.querySelector('input[name="file"]');
+      const fileName = fileInput.value;
+      const disallowedCharacters = /[!@#$%^&*(),?"{}|<>]/; // 특수 기호 거부
+      console.log("파일 이름:", fileName)
+  
+      if (disallowedCharacters.test(fileName)) {
         alert("파일명에 특수 기호가 포함되어 있습니다.");
-        return false;
+        return false; // 파일 업로드를 중단하기 위해 false를 반환합니다.
       }
-
-      return true;
+  
+      return true; // 파일 업로드를 진행할 수 있음을 나타내기 위해 true를 반환합니다.
     }
   </script>
+  
   <body>
     <div
       class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm"
