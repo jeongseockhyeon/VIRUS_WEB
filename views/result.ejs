@@ -61,7 +61,7 @@
       <div class="container">
         <div class="row">
           <% for (let i = 0; i < scanEngine.length; i++) { %>
-          <div class="col-md-3">
+          <div class="col-md-3 search" >
             <div class="card border-secondary mb-3" style="max-width: 20rem">
               <div class="card-header">
                 <%=
@@ -86,6 +86,25 @@
         </div>
       </div>
     </div>
+
+    <script>
+      $('.search').click(function() {
+        var cardText = $(this).find('.card-text').text();
+    
+        $.ajax({
+          url: '/search',
+          method: 'POST',
+          data: { searchText: cardText },
+          success: function(response) {
+            // 서버 응답 처리 코드
+            console.log(response);
+          },
+          error: function(error) {
+            console.log(error);
+          }
+        });
+      });
+    </script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

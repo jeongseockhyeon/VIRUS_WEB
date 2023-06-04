@@ -397,3 +397,22 @@ app.get('/removemacro', (req, res) => {
   })
 })
 
+app.get('/searchpage', function(req,res){
+  res.render('search.ejs')
+})
+
+app.post('/search',async function(req,res){
+  const { Configuration, OpenAIApi } = require("openai");
+  const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+  });
+  const openai = new OpenAIApi(configuration);
+
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{"role": "system", "content": "악성코드 전문가처럼 바이러스에 대해서 간단하게 한문장으로 설명해줘"},
+    {"role": "user", "content": ""}]
+  });
+  console.log(completion.data.choices[0].message)
+})
+
