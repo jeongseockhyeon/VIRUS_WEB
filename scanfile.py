@@ -27,7 +27,7 @@ def main():
 
     uploadresponse = requests.post(uploadurl,files=files, headers=headers)
     
-    sleep(10)
+    sleep(60)
     
     hash_value = hashlib.sha256(file_content).hexdigest()
 
