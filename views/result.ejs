@@ -35,6 +35,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
+
+
     <ul class="list-group">
       <li class="list-group-item">
         <h4>
@@ -61,7 +63,7 @@
       <div class="container">
         <div class="row">
           <% for (let i = 0; i < scanEngine.length; i++) { %>
-          <div class="col-md-3 search" >
+          <div class="col-md-3 search" id="card<%= scanEngine[i] %>">
             <div class="card border-secondary mb-3" style="max-width: 20rem">
               <div class="card-header">
                 <%=
@@ -89,20 +91,22 @@
 
     <script>
       $('.search').click(function() {
-        var cardText = $(this).find('.card-text').text();
+        const cardText = $(this).find('.card-text').text();
+        const cardId = $(this).attr('id')
     
-        $.ajax({
+        $.post({
           url: '/search',
-          method: 'POST',
-          data: { searchText: cardText },
+          data: { searchText: cardText, cardId: cardId },
           success: function(response) {
-            // 서버 응답 처리 코드
-            console.log(response);
-          },
-          error: function(error) {
-            console.log(error);
+            // 응답 처리
+            const cardId = response.cardId;
+            const aiResponse = response.aiResponse;
+            
+            // 카드 업데이트 등의 작업 수행
+            // 예시로 카드의 텍스트를 변경하는 코드를 추가합니다.
+            $('#' + cardId).find('.card-text').text(aiResponse);
           }
-        });
+        })
       });
     </script>
 
