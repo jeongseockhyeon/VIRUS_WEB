@@ -248,26 +248,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.redirect('/scan');
 })
 
-// 파일 업로드 처리 라우터
-app.post('/remove', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    res.status(400).send('파일이 업로드되지 않았습니다.');
-    return;
-  }
-  const filePath = path.resolve(req.file.path);
-  uploadFilePath = filePath
-  const fileExtension = path.extname(req.file.originalname).toLowerCase();
-  if (!allowedExtensions.includes(fileExtension)) {
-    deleteFile(filePath);
-    res.status(400).send('허용되지 않는 파일입니다.');
-    return;
-  }
-
-  console.log('파일 유형:', fileExtension);
-  console.log('업로드 완료!');
-  res.redirect('/removemacro');
-})
-
 //파이썬 프로그램 호출 및 파일 경로 전송
 app.get('/scan', (req, res) => {
   const filePath = uploadFilePath
@@ -414,7 +394,7 @@ app.get('/mecrosearch', (req, res) => {
       parseResponse = JSON.parse(response)
 
       console.log('매크로 검색 결과:', response);
-
+      deleteFile(uploadFilePath)
       res.render('macroresult', {
         macros: parseResponse.disable_monitoring_macros
       })
@@ -448,4 +428,63 @@ app.post('/search', async function(req, res) {
   res.send({ cardId: cardId, aiResponse: aiResponse })
 })
 
+app.get("/remove",function(req,res){
+  res.render("remove.ejs")
+})
 
+// 파일 업로드 처리 라우터
+app.post('/removeupload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    res.status(400).send('파일이 업로드되지 않았습니다.');
+    return;
+  }
+  const filePath = path.resolve(req.file.path);
+  uploadFilePath = filePath
+  const fileExtension = path.extname(req.file.originalname).toLowerCase();
+  if (!allowedExtensions.includes(fileExtension)) {
+    deleteFile(filePath);
+    res.status(400).send('허용되지 않는 파일입니다.');
+    return;
+  }
+
+  console.log('파일 유형:', fileExtension);
+  console.log('업로드 완료!');
+  res.redirect('/removemacro');
+})
+
+app.get('/removemacro', (req, res) => {
+  const filePath = uploadFilePath
+  const absFilePath = path
+    .resolve(filePath)
+    .replace(new RegExp(`\\${path.sep}`, 'g'), `\\\\`)
+  console.log(`매크로 제거 요청 - 파일 경로: ${absFilePath}`)
+  const { spawn } = require('child_process')
+
+  const command = 'python'
+  const args = ['VBAremove.py', absFilePath]
+  const options = {
+    cwd: __dirname, // VBAremove.py 파일이 있는 디렉토리로 설정
+  }
+
+  const pythonProcess = spawn(command, args, options)
+
+  res.setHeader('Content-Disposition', 'attachment; filename=fix.xlsm')
+  res.setHeader('Content-Type', 'application/vnd.ms-excel')
+
+  pythonProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`)
+    res.write(data, 'binary')
+  })
+
+  pythonProcess.stderr.on('data', (data) => {
+    if (data.includes('에러')) {
+      console.error(`stderr: ${data}`)
+      res.status(500).send('Internal Server Error')
+    }
+  })
+
+  pythonProcess.on('close', (code) => {
+    console.log(`child process exited with code ${code}`)
+    res.end()
+  })
+})

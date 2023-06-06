@@ -10,8 +10,8 @@ zip1.extractall()
 zip1.close()
 
 def move1():
-    current_folder = os.getcwd()
-    xl_folder = os.path.join(current_folder, "xl")
+    current_directory = "C:\\Users\\seokh\\Desktop\\workspace\\VIRUS_WEB\\remove"  # 압축 해제 폴더의 절대 경로로 변경
+    xl_folder = os.path.join(current_directory, "xl")
     os.chdir(xl_folder)
     vba_project_file = os.path.join(xl_folder, "vbaProject.bin")
 
