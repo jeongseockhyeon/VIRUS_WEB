@@ -16,7 +16,7 @@
       crossorigin="anonymous"
     />
 
-    <title>결과</title>
+    <title>매크로 검사 결과</title>
   </head>
   <body>
     <div
@@ -37,13 +37,22 @@
 
     <body>
       <% if (macros.length > 0) { %>
-          <h1>VBA 매크로를 찾았습니다:</h1>
-          <% macros.forEach(function(macro) { %>
-              <h2>매크로명: <%= macro.db_macro %></h2>
+        <h1>VBA 매크로를 찾았습니다:</h1>
+        <% macros.forEach(function(macro) { %>
+          <div class="card mb-4 shadow-sm" style="margin: 0%">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">매크로명: <%= macro.db_macro %></h4>
+            </div>
+            <div class="card-body">
               <pre><%= macro.macro_content %></pre>
+            </div>
+          </div>
           <% }) %>
+          <a href="/remove">매크로 제거하러 가기</a>
+          
       <% } else { %>
-          <h1>해당 파일에는 VBA 매크로가 없습니다.</h1>
+        <h1>해당 파일에는 VBA 매크로가 없습니다.</h1>
+        <a href="/">홈으로 돌아가기</a>
       <% } %>
     </body>
 
