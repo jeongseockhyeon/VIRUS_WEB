@@ -3,13 +3,20 @@ import os
 import shutil
 import sys
 import json
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+db_url = os.getenv('MONGODB_URL')
+client = MongoClient(db_url)
+db = client["virus_scan"]  # 데이터베이스 선택
+collection = db["VBAmacro"]  # 컬렉션 선택 (매크로 구문을 저장한 컬렉션명)
 
 file_path = sys.argv[1]
 extract_path = sys.argv[2]
 zip1 = zipfile.ZipFile(file_path)
 zip1.extractall(extract_path)
 zip1.close()
-
+macros = collection.find()
 def move1():
     current_directory = extract_path
     xl_folder = os.path.join(current_directory, "xl")
@@ -29,18 +36,18 @@ with open("vbaProject.bin", "rb") as f:
         if not data:
             break
 
-        def remove(input):
-            output = input.replace(b"Set-MpPreference -DisableRealtimeMonitoring", b"")
+        def remove_macros(input_data, macros):
+            output = input_data
+            for macro in macros:
+                macro_bytes = macro["macro"].encode()
+                output = output.replace(macro_bytes, b"")
             return output
 
-        result = remove(data)
-
-        def save(input, save_path):
-            with open(save_path, "wb") as file:
-                file.write(input)
+        result = remove_macros(data, macros)
 
         save_path = "vbaProject1.bin"
-        save(result, save_path)
+        with open(save_path, "wb") as file:
+            file.write(result)
 
         def move2():
             current_folder = os.getcwd()
