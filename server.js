@@ -358,30 +358,46 @@ app.get('/result/:id', function (req, res) {
   )
 })
 
+// 파일 업로드 처리 라우터
+app.post('/macroupload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    res.status(400).send('파일이 업로드되지 않았습니다.');
+    return;
+  }
+  const filePath = path.resolve(req.file.path);
+  uploadFilePath = filePath
+  const fileExtension = path.extname(req.file.originalname).toLowerCase();
+  if (!allowedExtensions.includes(fileExtension)) {
+    deleteFile(filePath);
+    res.status(400).send('허용되지 않는 파일입니다.');
+    return;
+  }
 
+  console.log('파일 유형:', fileExtension);
+  console.log('업로드 완료!');
+  res.redirect('/mecrosearch');
+})
 
-app.get('/removemacro', (req, res) => {
+app.get('/mecrosearch', (req, res) => {
   const filePath = uploadFilePath
   const absFilePath = path
     .resolve(filePath)
     .replace(new RegExp(`\\${path.sep}`, 'g'), `\\\\`)
-  console.log(`매크로 제거 요청 - 파일 경로: ${absFilePath}`)
+  console.log(`매크로 검색 요청 - 파일 경로: ${absFilePath}`)
   const { spawn } = require('child_process')
 
   const command = 'python'
-  const args = ['VBAremove.py', absFilePath]
+  const args = ['VBAsearch.py', absFilePath]
   const options = {
     cwd: __dirname, // VBAremove.py 파일이 있는 디렉토리로 설정
   }
 
   const pythonProcess = spawn(command, args, options)
-
-  res.setHeader('Content-Disposition', 'attachment; filename=fix.xlsm')
-  res.setHeader('Content-Type', 'application/vnd.ms-excel')
+  let result=''
 
   pythonProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`)
-    res.write(data, 'binary')
+    result += data.toString()
+
   })
 
   pythonProcess.stderr.on('data', (data) => {
@@ -392,13 +408,21 @@ app.get('/removemacro', (req, res) => {
   })
 
   pythonProcess.on('close', (code) => {
-    console.log(`child process exited with code ${code}`)
-    res.end()
+    if (code === 0) {
+      const response = result;
+
+      parseResponse = JSON.parse(response)
+
+      console.log('매크로 검색 결과:', response);
+
+      res.render('macroresult', {
+        macros: parseResponse.disable_monitoring_macros
+      })
+    } else {
+      console.error(`Python process exited with code ${code}`);
+    }
   })
 })
-
-
-
 
 app.post('/search', async function(req, res) {
   console.log(req.body.searchText);
@@ -423,4 +447,5 @@ app.post('/search', async function(req, res) {
   const aiResponse = completion.data.choices[0].message.content;
   res.send({ cardId: cardId, aiResponse: aiResponse })
 })
+
 
