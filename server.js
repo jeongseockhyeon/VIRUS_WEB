@@ -469,23 +469,39 @@ app.get('/removemacro', (req, res) => {
 
   const pythonProcess = spawn(command, args, options)
 
-  res.setHeader('Content-Disposition', 'attachment; filename=fix.xlsm')
-  res.setHeader('Content-Type', 'application/vnd.ms-excel')
-
   pythonProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`)
-    res.write(data, 'binary')
+ 
+    const result = JSON.parse(data); // 파이썬에서 반환된 JSON 파싱
+
+  
+    const fixFilePath = result.file_path; // file_path 값을 추출
+    const fileStream = fs.createReadStream(fixFilePath);
+    fileStream.pipe(res)
+    deleteFile(fixFilePath)
   })
+
+  pythonProcess.stdout.on('end', () => {
+    console.log('Python process ended');
+    deleteFile(uploadFilePath);
+   
+  });
+
 
   pythonProcess.stderr.on('data', (data) => {
     if (data.includes('에러')) {
+      
       console.error(`stderr: ${data}`)
       res.status(500).send('Internal Server Error')
     }
   })
 
   pythonProcess.on('close', (code) => {
+
+
+    
     console.log(`child process exited with code ${code}`)
+    
     res.end()
+    
   })
 })
