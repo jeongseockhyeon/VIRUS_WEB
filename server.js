@@ -472,10 +472,11 @@ app.get('/removemacro', (req, res) => {
   pythonProcess.stdout.on('data', (data) => {
  
     const result = JSON.parse(data); // 파이썬에서 반환된 JSON 파싱
-
-  
     const fixFilePath = result.file_path; // file_path 값을 추출
     const fileStream = fs.createReadStream(fixFilePath);
+    const originalExtension = path.extname(filePath);
+    const fileName = `fixed_file${originalExtension}`; // 원본 확장자를 유지한 파일명 설정
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`); // 다운로드 시 파일명 설정
     fileStream.pipe(res)
     deleteFile(fixFilePath)
   })
