@@ -39,14 +39,14 @@
       <% if (macros.length > 0) { %>
         <h1>VBA 매크로를 찾았습니다:</h1>
         <% macros.forEach(function(macro) { %>
-          <div class="card mb-4 shadow-sm" style="margin: 0%">
+          <div class="card mb-4 shadow-sm search" id="<%= macro.db_macro %>">
             <div class="card-header">
-              <h4 class="my-0 font-weight-normal">매크로명: <%= macro.db_macro %></h4>
+              <%= macro.db_macro %>
             </div>
             <div class="card-body">
               <pre><%= macro.macro_content %></pre>
             </div>
-          </div>
+            <p class="card-text">설명란</p>
           <% }) %>
           <a href="/remove">매크로 제거하러 가기</a>
           
@@ -55,6 +55,27 @@
         <a href="/">홈으로 돌아가기</a>
       <% } %>
     </body>
+
+    <script>
+      $('.search').click(function() {
+        const cardHeader = $(this).find('.card-header').text();
+        const cardId = $(this).attr('id')
+    
+        $.post({
+          url: '/search',
+          data: { searchText: cardHeader, cardId: cardId },
+          success: function(response) {
+            // 응답 처리
+            const cardId = response.cardId;
+            const aiResponse = response.aiResponse;
+            
+            // 카드 업데이트 등의 작업 수행
+            // 예시로 카드의 텍스트를 변경하는 코드를 추가합니다.
+            $('#' + cardId).find('.card-header').text(aiResponse);
+          }
+        })
+      });
+    </script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
