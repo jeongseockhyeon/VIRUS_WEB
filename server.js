@@ -454,6 +454,7 @@ app.post('/removeupload', upload.single('file'), (req, res) => {
 
 app.get('/removemacro', (req, res) => {
   const filePath = uploadFilePath
+  const removeFolderPath = path.resolve(__dirname,'remove')
   const absFilePath = path
     .resolve(filePath)
     .replace(new RegExp(`\\${path.sep}`, 'g'), `\\\\`)
@@ -461,7 +462,7 @@ app.get('/removemacro', (req, res) => {
   const { spawn } = require('child_process')
 
   const command = 'python'
-  const args = ['VBAremove.py', absFilePath]
+  const args = ['VBAremove.py', absFilePath,removeFolderPath]
   const options = {
     cwd: __dirname, // VBAremove.py 파일이 있는 디렉토리로 설정
   }

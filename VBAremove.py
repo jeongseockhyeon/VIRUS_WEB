@@ -4,13 +4,13 @@ import shutil
 import sys
 
 file_path = sys.argv[1]
-
+extract_path = sys.argv[2]
 zip1 = zipfile.ZipFile(file_path)
-zip1.extractall()
+zip1.extractall(extract_path)
 zip1.close()
 
 def move1():
-    current_directory = "C:\\Users\\seokh\\Desktop\\workspace\\VIRUS_WEB\\remove"  # 압축 해제 폴더의 절대 경로로 변경
+    current_directory = extract_path
     xl_folder = os.path.join(current_directory, "xl")
     os.chdir(xl_folder)
     vba_project_file = os.path.join(xl_folder, "vbaProject.bin")
