@@ -6,6 +6,7 @@ import json
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
+load_dotenv()
 db_url = os.getenv('MONGODB_URL')
 client = MongoClient(db_url)
 db = client["virus_scan"]  # 데이터베이스 선택

@@ -23,8 +23,6 @@ def find_vba_macro(file_path):
 def extract_disable_monitoring_macros(macros, db_macros):
     disable_monitoring_macros = []
     
-    
-
     for macro in macros:
         macro_content = macro[3]
         # 매크로 구문과 DB에 저장된 매크로 구문을 비교합니다.
