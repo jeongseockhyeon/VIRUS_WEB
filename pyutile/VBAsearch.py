@@ -28,8 +28,6 @@ def extract_disable_monitoring_macros(macros, db_macros):
         # 매크로 구문과 DB에 저장된 매크로 구문을 비교합니다.
         for db_macro in db_macros:
             if db_macro["macro"] in macro_content:
-                # 정규식을 사용하여 불필요한 부분을 제거합니다.
-                
                 disable_monitoring_macros.append({
                     'db_macro' : db_macro["macro"],
                     'macro_content' : macro_content

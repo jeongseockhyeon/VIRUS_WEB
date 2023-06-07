@@ -50,9 +50,6 @@
             <p>
               검출된 바이러스명: <%= scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].value %>
             </p>
-            <p>
-              검출된 개수: <%= scanResult.data.attributes.popular_threat_classification.popular_threat_category[i].count %>
-            </p>
           <% } %>
         <% } else { %>
           <p>해당 파일은 안전합니다. :)</p>

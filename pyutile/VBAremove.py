@@ -11,9 +11,15 @@ db_url = os.getenv('MONGODB_URL')
 client = MongoClient(db_url)
 db = client["virus_scan"]  # 데이터베이스 선택
 collection = db["VBAmacro"]  # 컬렉션 선택 (매크로 구문을 저장한 컬렉션명)
-
+# 파일 경로에서 디렉토리 경로와 파일명을 분리
 file_path = sys.argv[1]
 extract_path = sys.argv[2]
+
+directory, filename = os.path.split(file_path)
+
+
+# 새로운 파일명 생성
+new_filename = "fix_" + filename
 zip1 = zipfile.ZipFile(file_path)
 zip1.extractall(extract_path)
 zip1.close()
@@ -75,7 +81,7 @@ with open("vbaProject.bin", "rb") as f:
 
         def zip():
             current_directory = os.getcwd()
-            fixfile = os.path.join(current_directory, "fix.xlsm")
+            fixfile = os.path.join(current_directory, new_filename)
             rel_directory = os.path.join(current_directory, "_rels")
             docprops_directory = os.path.join(current_directory, "docProps")
             xl_directory = os.path.join(current_directory, "xl")

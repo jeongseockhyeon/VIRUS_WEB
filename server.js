@@ -380,7 +380,7 @@ app.get('/mecrosearch', (req, res) => {
   const pyPath = path.join(__dirname, 'pyutile', 'VBAsearch.py')
   const args = [pyPath, absFilePath]
   const options = {
-    cwd: __dirname, // VBAremove.py 파일이 있는 디렉토리로 설정
+    cwd: __dirname, // VBAsearch.py 파일이 있는 디렉토리로 설정
   }
 
   const pythonProcess = spawn(command, args, options)
