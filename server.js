@@ -266,7 +266,8 @@ app.get('/scan', (req, res) => {
   const { spawn } = require('child_process')
 
   const command = 'python'
-  const args = ['scanfile.py', absFilePath]
+  const pyPath = path.join(__dirname, 'pyutile', 'scanfile.py')
+  const args = [pyPath, absFilePath]
   const options = {
     cwd: __dirname, // scanfile.py 파일이 있는 디렉토리로 설정
   }
@@ -376,7 +377,8 @@ app.get('/mecrosearch', (req, res) => {
   const { spawn } = require('child_process')
 
   const command = 'python'
-  const args = ['VBAsearch.py', absFilePath]
+  const pyPath = path.join(__dirname, 'pyutile', 'VBAsearch.py')
+  const args = [pyPath, absFilePath]
   const options = {
     cwd: __dirname, // VBAremove.py 파일이 있는 디렉토리로 설정
   }
@@ -477,7 +479,8 @@ app.get('/removemacro', (req, res) => {
   const { spawn } = require('child_process')
 
   const command = 'python'
-  const args = ['VBAremove.py', absFilePath, removeFolderPath]
+  const pyPath = path.join(__dirname, 'pyutile', 'VBAremove.py')
+  const args = [pyPath, absFilePath, removeFolderPath]
   const options = {
     cwd: __dirname, // VBAremove.py 파일이 있는 디렉토리로 설정
   }
