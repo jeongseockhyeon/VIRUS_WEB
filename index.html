@@ -35,9 +35,7 @@
   </script>
   
   <body>
-    <div
-      class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm"
-    >
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
       <h5 class="my-0 mr-md-auto font-weight-normal">백신GO</h5>
       <nav class="my-2 my-md-0 mr-md-3">
         <a class="p-2 text-dark" href="/">홈</a>
@@ -47,18 +45,16 @@
         <button class="btn btn-outline-primary" type="button">로그인</button>
       </a>
     </div>
-  </div>
-  <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-    <h1 class="display-4">백신GO</h1>
-    <p class="lead">
-      검사와 분석하는중 개인정보나 중요한 정보들은 강력한 보안으로 막아 유출될
-      수 없습니다.
-    </p>
-    <div class="card-group">
-      <div class="card-deck mb-3 text-center">
-        
-        <form action="macroupload"  method="post" enctype="multipart/form-data" onsubmit="return validateFileName()">
-          <div class="card mb-4 shadow-sm" >
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+      <h1 class="display-4">백신GO</h1>
+      <p class="lead">
+        검사와 분석하는중 개인정보나 중요한 정보들은 강력한 보안으로 막아 유출될
+        수 없습니다.
+      </p>
+  
+      <div class="card-deck mb-3 text-center d-flex justify-content-center">
+        <form action="macroupload" method="post" enctype="multipart/form-data" onsubmit="return validateFileName()">
+          <div class="card mb-4 shadow-sm">
             <div class="card-header">
               <h4 class="my-0 font-weight-normal">VBA 매크로 탐지</h4>
             </div>
@@ -73,99 +69,88 @@
                 <li>Help center access</li>
               </ul>
               <input
-              type="file"
-              name="file"
-              accept=".doc,.docx,.ppt,.pptx,.xls,.xlsx,.xlsm, .pdf"
-            />
-            <input type=submit style="width:100pt;height:40pt;" value="파일제출">
+                type="file"
+                name="file"
+                accept=".doc,.docx,.ppt,.pptx,.xls,.xlsx,.xlsm,.pdf"
+              />
+              <input type="submit" style="width: 100pt; height: 40pt;" value="파일제출">
             </div>
-      </div>
+          </div>
         </form>
-      
-    <form action="upload" method="post" enctype="multipart/form-data" onsubmit="return validateFileName()">
-      <div class="card mb-4 shadow-sm">
-        <div class="card-header">
-          <h4 class="my-0 font-weight-normal">진단</h4>
-        </div>
-        <div class="card-body">
-          <h1 class="card-title pricing-card-title">
-            0$ <small class="text-muted"></small>
-          </h1>
-          <ul class="list-unstyled mt-3 mb-4">
-            <li>20 users included</li>
-            <li>10 GB of storage</li>
-            <li>Priority email support</li>
-            <li>Help center access</li>
-          </ul>
-          <input
-            type="file"
-            name="file"
-            accept=".doc,.docx,.ppt,.pptx,.xls,.xlsx,.xlsm, .pdf"
-          />
-          <input type=submit style="width:100pt;height:40pt;" value="파일제출">
-        </div>
-      </div>
-    </form>
-    
-    
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header">
-        <h4 class="my-0 font-weight-normal">게시판</h4>
-      </div>
-      <div class="card-body">
-        <h1 class="card-title pricing-card-title">
-          Q&A<small class="text-muted"></small>
-        </h1>
-        <ul class="list-unstyled mt-3 mb-4">
-          <li>여러분의 성원과 응원,그리고</li>
-          <li>의견이 필요합니다.</li>
-          <li>자유롭게</li>
-          <li>의견을 남겨주세요</li>
-        </ul>
-        <a href="/board">
-        <input type="button" style="width: 350pt;height:30pt;" value="Contact us">
-      </a>
-      </div>
-        </div>
+  
+        <form action="upload" method="post" enctype="multipart/form-data" onsubmit="return validateFileName()">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">진단</h4>
+            </div>
+            <div class="card-body">
+              <h1 class="card-title pricing-card-title">
+                0$ <small class="text-muted"></small>
+              </h1>
+              <ul class="list-unstyled mt-3 mb-4">
+                <li>20 users included</li>
+                <li>10 GB of storage</li>
+                <li>Priority email support</li>
+                <li>Help center access</li>
+              </ul>
+              <input
+                type="file"
+                name="file"
+                accept=".doc,.docx,.ppt,.pptx,.xls,.xlsx,.xlsm,.pdf"
+              />
+              <input type="submit" style="width: 100pt; height: 40pt;" value="파일제출">
+            </div>
+          </div>
+        </form>
+  
+        <form class="text-center" action="/board">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">게시판</h4>
+            </div>
+            <div class="card-body">
+              <h1 class="card-title pricing-card-title">
+                Q&A<small class="text-muted"></small>
+              </h1>
+              <ul class="list-unstyled mt-3 mb-4">
+                <li>여러분의 성원과 응원, 그리고</li>
+                <li>의견이 필요합니다.</li>
+                <li>자유롭게</li>
+                <li>의견을 남겨주세요</li>
+              </ul>
+              <a href="/board">
+                <input type="button" style="width: 350pt; height: 30pt;" value="Contact us">
+              </a>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-
-      <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item dropup">
-              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">사용자 정보</a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">파일</a>
-                <a class="dropdown-item" href="#">계정정보</a>
-              </div>
-            </li>
-          </ul>
-        </div>
+    <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropup">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">사용자 정보</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="#">파일</a>
+              <a class="dropdown-item" href="#">계정정보</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
-      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-      crossorigin="anonymous"
-    ></script>
-
-    
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   </body>
+  
 </html>
