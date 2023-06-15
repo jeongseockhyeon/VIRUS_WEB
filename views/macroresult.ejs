@@ -16,7 +16,7 @@
       crossorigin="anonymous"
     />
 
-    <title>매크로 검사 결과</title>
+    <title>VBA 매크로 검사 결과</title>
   </head>
   <body>
     <div
@@ -39,7 +39,6 @@
         <div class="card-body">
           <pre><%= macro.macro_content %></pre>
         </div>
-        <p class="card-text">설명란</p>
       </div>
       > <% }) %>
       <a href="/remove">매크로 제거하러 가기</a>
@@ -49,29 +48,6 @@
       <a href="/">홈으로 돌아가기</a>
       <% } %>
     </body>
-
-    <script>
-      $('.search').click(function () {
-        const cardHeader = $(this).find('.card-header').text()
-        const cardId = $(this).attr('id')
-
-        $.post({
-          url: '/search',
-          data: { searchText: cardHeader, cardId: cardId },
-          success: function (response) {
-            // 응답 처리
-            const cardId = response.cardId
-            const aiResponse = response.aiResponse
-
-            // 카드 업데이트 등의 작업 수행
-            // 예시로 카드의 텍스트를 변경하는 코드를 추가합니다.
-            $('#' + cardId)
-              .find('.card-header')
-              .text(aiResponse)
-          },
-        })
-      })
-    </script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
