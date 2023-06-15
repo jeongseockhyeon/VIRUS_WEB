@@ -60,27 +60,29 @@
       <div class="container">
         <div class="row">
           <% for (let i = 0; i < scanEngine.length; i++) { %>
-          <div class="col-md-3 search" id="card<%= scanEngine[i] %>">
-            <div class="card border-secondary mb-3" style="max-width: 20rem">
-              <div class="card-header">
-                <%=
-                scanResult.data.attributes.last_analysis_results[scanEngine[i]].engine_name 
-                %>
+            <% if(scanResult.data.attributes.last_analysis_results[scanEngine[i]].category == 'malicious') { %>
+              <div class="col-md-3 search" id="card<%= scanEngine[i] %>">
+                <div class="card border-secondary mb-3" style="max-width: 20rem">
+                  <div class="card-header">
+                    <%=
+                    scanResult.data.attributes.last_analysis_results[scanEngine[i]].engine_name 
+                    %>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-title">
+                      <%=
+                      scanResult.data.attributes.last_analysis_results[scanEngine[i]].category
+                      %>
+                    </p>
+                    <p class="card-text">
+                      <%=
+                      scanResult.data.attributes.last_analysis_results[scanEngine[i]].result
+                      %>
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div class="card-body">
-                <p class="card-title">
-                  <%=
-                  scanResult.data.attributes.last_analysis_results[scanEngine[i]].category
-                  %>
-                </p>
-                <p class="card-text">
-                  <%=
-                  scanResult.data.attributes.last_analysis_results[scanEngine[i]].result
-                  %>
-                </p>
-              </div>
-            </div>
-          </div>
+              <% } %>
           <% } %>
         </div>
       </div>
