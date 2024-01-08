@@ -39,12 +39,12 @@
           <tr>
             <th scope="col"><%= user[i]._id %></th>
             <th scope="col">
-              <a href="detail/<%= user[i]._id %>"><%= user[i].제목 %></a>
+              <a href="/board/detail/<%= user[i]._id %>"><%= user[i].제목 %></a>
             </th>
             <th scope="col"><%= user[i].작성자 %></th>
             <th scope="col"><%= user[i].날짜 %>
                 <button class="btn btn-danger delete"
-                data-id="<%= user[i]._id %>">글 삭제</button>
+                data-id="/board/<%= user[i]._id %>">글 삭제</button>
             </th>
           </tr>
         </tbody>

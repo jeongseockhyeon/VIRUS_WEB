@@ -1,9 +1,7 @@
 const express = require('express')
 const multer = require('multer')
-const User = require('./models/User')
 const fs = require('fs')
 const path = require('path')
-const bcrypt = require('bcryptjs')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 
@@ -13,7 +11,6 @@ const app = express()
 const { ObjectId } = require('mongodb')
 
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy
 const session = require('express-session')
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -127,367 +124,32 @@ MongoClient.connect(process.env.MONGODB_URL, function (error, client) {
   })
 })
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html')
-})
+const Main = require('./routes/Main')
+app.use('/',Main)
 
-app.get('/login', function (req, res) {
-  res.render('login.ejs')
-})
+const Login = require('./routes/Login')
+app.use('/login',Login)
 
-app.get('/register', function (req, res) {
-  res.render('register.ejs')
-})
+const Register = require('./routes/Register')
+app.use('/register',Register)
 
-app.post('/register', async function (req, res) {
-  const { 성, 이름, 아이디, 이메일, 비밀번호, 주소, 국가, 세부지역 } = req.body
-
-  try {
-    let user = await db.collection('users').findOne({ 이메일 })
-    if (user) {
-      return res
-        .status(400)
-        .json({ errors: [{ message: '이미 가입된 이메일입니다.' }] })
-    }
-
-    const hashedPassword = await bcrypt.hash(비밀번호, 10)
-    user = new User({
-      성,
-      이름,
-      아이디,
-      이메일,
-      비밀번호: hashedPassword,
-      주소,
-      국가,
-      세부지역,
-    })
-
-    db.collection('users').insertOne(user)
-
-    res.redirect('/login')
-  } catch (error) {
-    console.log(error)
-    res.status(500).send('오류 발생')
-  }
-})
-
-app.post(
-  '/login',
-  passport.authenticate('local', { failureRedirect: '/login' }),
-  function (req, res) {
-    res.redirect('/mypage')
-  }
-)
-
-passport.use(
-  new LocalStrategy(
-    {
-      usernameField: 'inputEmail',
-      passwordField: 'inputPassword',
-      session: true,
-      passReqToCallback: false,
-    },
-    function (inputEmail, inputPassword, done) {
-      db.collection('users').findOne(
-        { 이메일: inputEmail },
-        function (err, result) {
-          if (err) return done(err)
-          if (!result)
-            return done(null, false, { message: '가입되지 않은 이메일입니다.' })
-          if (bcrypt.compareSync(inputPassword, result.비밀번호)) {
-            return done(null, result)
-          } else {
-            return done(null, false, { message: '비밀번호가 틀렸습니다' })
-          }
-        }
-      )
-    }
-  )
-)
-
-passport.serializeUser(function (user, done) {
-  done(null, user.이메일)
-})
-passport.deserializeUser(function (email, done) {
-  db.collection('users').findOne({ 이메일: email }, function (err, result) {
-    done(null, result)
-  })
-})
 
 // 마이페이지
-app.get('/mypage', 로그인확인, function (요청, 응답) {
-  console.log(요청.user)
-  db.collection('board.post')
-    .find({ 작성자: 요청.user.아이디 })
-    .toArray(function (에러, 결과) {
-      응답.render('mypage.ejs', { user: 결과, 사용자: 요청.user })
-    })
-})
+const MyPage = require('./routes/MyPage')
+app.use('/mypage',MyPage)
 
-function 로그인확인(요청, 응답, next) {
-  if (요청.user) {
-    next()
-  } else {
-    응답.send('로그인이 필요합니다.')
-  }
-}
 
 // 로그아웃 기능
-app.get('/logout', function (req, res, next) {
-  req.logout(function (err) {
-    if (err) {
-      return next(err)
-    }
-    res.redirect('/')
-  })
-})
+const Logout = require('./routes/Logout')
+app.use('/logout',Logout)
 
 // 게시판 기능
-app.get('/board', function (요청, 응답) {
-  db.collection('board.post')
-    .find()
-    .toArray(function (에러, 결과) {
-      console.log(결과)
-      응답.render('board.ejs', { posts: 결과 })
-    })
-})
+const Board = require('./routes/Board')
+app.use('/board',Board)
 
-app.get('/board/write', 로그인확인, function (요청, 응답) {
-  응답.render('write.ejs', { 사용자: 요청.user })
-})
 
-app.post('/add', function (요청, 응답) {
-  console.log('제목: ' + 요청.body.title)
-  console.log('내용: ' + 요청.body.content)
-  console.log('날짜: ' + new Date())
-  console.log('작성자: ' + 요청.body.아이디)
-
-  db.collection('board.counter').findOne(
-    { name: '게시물갯수' },
-    function (에러, 결과) {
-      var 총게시물갯수 = 결과.totalPost
-
-      db.collection('board.post').insertOne(
-        {
-          _id: 총게시물갯수 + 1,
-          제목: 요청.body.title,
-          내용: 요청.body.content,
-          날짜: new Date(),
-          작성자: 요청.body.아이디,
-        },
-        function (에러, 결과) {
-          db.collection('board.counter').updateOne(
-            { name: '게시물갯수' },
-            {
-              $inc: { totalPost: 1 },
-              function(에러, 결과) {
-                if (에러) {
-                  return console.log(에러)
-                }
-              },
-            }
-          )
-        }
-      )
-    }
-  )
-  응답.redirect('/board')
-})
-
-app.get('/detail/:id', function (요청, 응답) {
-  db.collection('board.post').findOne(
-    { _id: parseInt(요청.params.id) },
-    function (에러, 결과) {
-      응답.render('detail.ejs', { data: 결과 })
-    }
-  )
-})
-
-app.get('/detail/:id/edit', function (요청, 응답) {
-  db.collection('board.post').findOne(
-    { _id: parseInt(요청.params.id) },
-    function (에러, 결과) {
-      응답.render('edit.ejs', { post: 결과 })
-    }
-  )
-})
-
-app.put('/edit', function (요청, 응답) {
-  db.collection('board.post').updateOne(
-    { _id: parseInt(요청.body.id) },
-    {
-      $set: {
-        제목: 요청.body.title,
-        내용: 요청.body.content,
-        날짜: new Date(),
-      },
-    },
-    function () {
-      console.log('수정완료')
-      응답.redirect('/board')
-    }
-  )
-})
-
-app.delete('/delete', function (요청, 응답) {
-  요청.body._id = parseInt(요청.body._id)
-  db.collection('board.post').deleteOne(
-    { _id: 요청.body._id, 작성자: 요청.user.아이디 },
-    function (에러, 결과) {
-      console.log('삭제완료')
-      console.log('에러', 에러)
-      응답.status(200).send({ message: '성공했습니다' })
-    }
-  )
-})
-
-// 파일 저장 디렉토리 설정
-const storage = multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, 'upload/')
-  },
-  filename: function (req, file, callback) {
-    callback(null, file.originalname)
-  },
-})
-
-// 파일 업로드 미들웨어 생성
-const upload = multer({ storage: storage })
-
-// 파일 삭제 처리 함수
-const deleteFile = (filePath) => {
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error('파일 삭제 오류', err)
-    } else {
-      console.log('파일 삭제 완료')
-    }
-  })
-}
-
-// 파일 업로드 처리 라우터
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    res.status(400).send('파일이 업로드되지 않았습니다.')
-    return
-  }
-  const filePath = path.resolve(req.file.path)
-  uploadFilePath = filePath
-  const fileExtension = path.extname(req.file.originalname).toLowerCase()
-  if (!allowedExtensions.includes(fileExtension)) {
-    deleteFile(filePath)
-    res.status(400).send('허용되지 않는 파일입니다.')
-    return
-  }
-
-  console.log('파일 유형:', fileExtension)
-  console.log('업로드 완료!')
-  res.redirect('/scan')
-})
-
-//파이썬 프로그램 호출 및 파일 경로 전송
-app.get('/scan', (req, res) => {
-  const filePath = uploadFilePath
-  const absFilePath = path
-    .resolve(filePath)
-    .replace(new RegExp(`\\${path.sep}`, 'g'), `\\\\`)
-  console.log(`스캔 요청 - 파일 경로: ${absFilePath}`)
-  const { spawn } = require('child_process')
-
-  const command = 'python'
-  const pyPath = path.join(__dirname, 'pyutile', 'scanfile.py')
-  const args = [pyPath, absFilePath]
-  const options = {
-    cwd: __dirname, // scanfile.py 파일이 있는 디렉토리로 설정
-  }
-
-  const pythonProcess = spawn(command, args, options)
-
-  let pythonResult = ''
-
-  pythonProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`)
-    pythonResult += data
-  })
-
-  pythonProcess.stdout.on('end', () => {
-    console.log('Python process ended')
-    deleteFile(uploadFilePath)
-    // DB에서 이미 저장된 결과값인지 검색
-    db.collection('scanresult').findOne({ result: pythonResult }, (error, existingResult) => {
-      if (error) {
-        console.error('MongoDB 조회 오류', error);
-        res.status(500).send('Internal Server Error');
-        return;
-      }
-      
-      console.log('DB 확인');
-      if (!existingResult) {
-        // pythonResult가 이미 저장되지 않은 경우
-        console.log('DB에 저장되어 있지 않은 악성 문서입니다.')
-        db.collection('scanresult').insertOne({ result: pythonResult }, (error, result) => {
-          if (error) {
-            console.error('MongoDB 저장 오류', error);
-            res.status(500).send('Internal Server Error');
-            return;
-          }
-          const savedId = result.insertedId;  // 삽입된 문서의 _id 값
-          console.log(savedId);
-          console.log('결과 저장 완료');
-          res.redirect(`/result/${savedId}`);  
-        });
-      } else {
-        // pythonResult가 이미 저장된 경우
-        console.log('DB에 저장되어 있는 악성 문서입니다.')
-        const findId = existingResult._id;  // 이미 저장된 문서의 _id 값
-        console.log(findId);
-        res.redirect(`/result/${findId}`);  
-      }
-    });
-  })
-
-  pythonProcess.stderr.on('data', (data) => {
-    if (data.includes('에러')) {
-      console.error(`stderr: ${data}`)
-      res.status(500).send('Internal Server Error')
-    }
-  })
-
-  pythonProcess.on('close', (code) => {
-    console.log(`child process exited with code ${code}`)
-  })
-})
-
-app.get('/result/:id', function (req, res) {
-  const id = req.params.id
-  const objectId = new ObjectId(id)
-  console.log(objectId)
-  db.collection('scanresult').findOne(
-    { _id: objectId },
-    function (err, result) {
-      if (err) {
-        console.error('데이터베이스 조회 오류', err)
-        res.status(500).send('Internal Server Error')
-        return
-      }
-
-      if (!result) {
-        console.error('결과를 찾을 수 없습니다')
-        res.status(404).send('Not Found')
-        return
-      }
-
-      try {
-        jsonResult = JSON.parse(result.result)
-        console.log(jsonResult)
-        res.render('result.ejs', { scanResult: jsonResult, scanEngine })
-      } catch (error) {
-        console.error('JSON 파싱 오류', error)
-        res.status(500).send('Internal Server Error')
-      }
-    }
-  )
-})
+const VirusScan = require('./routes/VirusScan')
+app.use('/virusscan',VirusScan)
 
 // 매크로 검색 처리 구역
 // 파일 업로드 처리 라우터
