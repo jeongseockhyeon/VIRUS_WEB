@@ -3,6 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const { ObjectId } = require('mongodb')
 
+
 const router = require('express').Router()
 const MongoClient = require('mongodb').MongoClient
 
@@ -109,7 +110,7 @@ const storage = multer.diskStorage({
         callback(null, file.originalname)
     },
 })
-
+let uploadFilePath = ''
 // 파일 업로드 미들웨어 생성
 const upload = multer({ storage: storage })
 
@@ -150,11 +151,12 @@ router.get('/scan', (req, res) => {
     const absFilePath = path
         .resolve(filePath)
         .replace(new RegExp(`\\${path.sep}`, 'g'), `\\\\`)
+    const pyPath = path.join(__dirname, '../pyutile', 'scanfile.py')
     console.log(`스캔 요청 - 파일 경로: ${absFilePath}`)
     const { spawn } = require('child_process')
 
     const command = 'python'
-    const pyPath = path.join(__dirname, '../pyutile', 'scanfile.py')
+    //const pyPath = path.join(__dirname, '../pyutile', 'scanfile.py')
     const args = [pyPath, absFilePath]
     const options = {
         cwd: __dirname, // scanfile.py 파일이 있는 디렉토리로 설정

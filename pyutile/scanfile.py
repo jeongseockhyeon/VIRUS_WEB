@@ -1,5 +1,5 @@
 import hashlib
-import requests
+import requests # type: ignore
 import json
 import sys
 from dotenv import load_dotenv

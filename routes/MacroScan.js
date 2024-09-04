@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const fs = require('fs')
 const path = require('path')
+const multer = require('multer')
 const MongoClient = require('mongodb').MongoClient
 
 
@@ -14,7 +15,7 @@ const allowedExtensions = [
     '.xlsm',
     '.pdf',
 ]
-
+let uploadFilePath = ''
 let db
 
 MongoClient.connect(process.env.MONGODB_URL, function (error, client) {
@@ -75,7 +76,7 @@ router.post('/macroupload', upload.single('file'), (req, res) => {
     const { spawn } = require('child_process')
   
     const command = 'python'
-    const pyPath = path.join(__dirname, 'pyutile', 'VBAsearch.py')
+    const pyPath = path.join(__dirname, '../pyutile', 'VBAsearch.py')
     const args = [pyPath, absFilePath]
     const options = {
       cwd: __dirname, // VBAsearch.py 파일이 있는 디렉토리로 설정
@@ -214,3 +215,5 @@ router.post('/macroupload', upload.single('file'), (req, res) => {
       res.end()
     })
   })
+
+  module.exports = router
